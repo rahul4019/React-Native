@@ -11,6 +11,7 @@ import React, {useState} from 'react';
 import {z} from 'zod';
 import {useForm, SubmitHandler, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
 const passwordSchema = z.object({
   passwordLength: z
@@ -91,6 +92,8 @@ export default function App() {
       <SafeAreaView style={styles.appContainer}>
         <View style={styles.formContainer}>
           <Text style={styles.title}>Password Generator</Text>
+
+          {/* password length */}
           <View style={styles.inputWrapper}>
             <View style={styles.inputColumn}>
               <Text style={styles.heading}>Password Length</Text>
@@ -115,13 +118,59 @@ export default function App() {
               </Text>
             )}
           </View>
+
+          {/* lowercase */}
           <View style={styles.inputWrapper}>
-            <Text style={styles.heading}>Include Lowercase</Text>
-            <BouncyCheckBox />
+            <Text style={styles.heading}>Include Lowercase letters</Text>
+            <View>
+              <BouncyCheckbox
+                useBuiltInState={false}
+                isChecked={isLowerCase}
+                onPress={() => setIsLowerCase(!isLowerCase)}
+                fillColor="#29ab87"
+              />
+            </View>
           </View>
-          <View style={styles.inputWrapper}></View>
-          <View style={styles.inputWrapper}></View>
-          <View style={styles.inputWrapper}></View>
+
+          {/* uppercase */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.heading}>Include Uppercase letters</Text>
+            <View>
+              <BouncyCheckbox
+                useBuiltInState={false}
+                isChecked={isUpperCase}
+                onPress={() => setIsUpperCase(!isUpperCase)}
+                fillColor="#FED85D"
+              />
+            </View>
+          </View>
+
+          {/* number */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.heading}>Include Numbers</Text>
+            <View>
+              <BouncyCheckbox
+                useBuiltInState={false}
+                isChecked={isNumbers}
+                onPress={() => setIsNumbers(!isNumbers)}
+                fillColor="#c9a0dc"
+              />
+            </View>
+          </View>
+
+          {/* symbol */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.heading}>Include Symbols</Text>
+            <View>
+              <BouncyCheckbox
+                useBuiltInState={false}
+                isChecked={isSymbols}
+                onPress={() => setIsSymbols(!isSymbols)}
+                fillColor="#fc80a5"
+              />
+            </View>
+          </View>
+
           <View style={styles.formActions}>
             <TouchableOpacity>
               <Text>Generate Password</Text>
