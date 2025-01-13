@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {z} from 'zod';
-import {useForm, SubmitHandler} from 'react-hook-form';
+import {useForm, SubmitHandler, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 
 const passwordSchema = z.object({
@@ -77,7 +77,8 @@ export default function App() {
     register,
     handleSubmit,
     reset,
-    formState: {errors},
+    control,
+    formState: {errors, touchedFields},
   } = useForm({resolver: zodResolver(passwordSchema)});
 
   const onSubmit = (values: z.infer<typeof passwordSchema>) => {
@@ -92,10 +93,32 @@ export default function App() {
           <Text style={styles.title}>Password Generator</Text>
           <View style={styles.inputWrapper}>
             <View style={styles.inputColumn}>
-              <TextInput style={styles.inputStyle} />
+              <Text style={styles.heading}>Password Length</Text>
             </View>
+            <Controller
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                <TextInput
+                  style={styles.inputStyle}
+                  placeholder="Ex. 8"
+                  keyboardType="numeric"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value?.toString()}
+                />
+              )}
+              name="passwordLength"
+            />
+            {touchedFields.passwordLength && errors.passwordLength && (
+              <Text style={styles.errorText}>
+                {errors.passwordLength.message?.toString()}
+              </Text>
+            )}
           </View>
-          <View style={styles.inputWrapper}></View>
+          <View style={styles.inputWrapper}>
+            <Text style={styles.heading}>Include Lowercase</Text>
+            <BouncyCheckBox />
+          </View>
           <View style={styles.inputWrapper}></View>
           <View style={styles.inputWrapper}></View>
           <View style={styles.inputWrapper}></View>
