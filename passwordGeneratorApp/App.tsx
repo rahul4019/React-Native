@@ -8,16 +8,25 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {isValid, z} from 'zod';
+import {isValid, string, z} from 'zod';
 import {useForm, SubmitHandler, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
 const passwordSchema = z.object({
   passwordLength: z
-    .number()
-    .min(4, {message: 'Must be 4 or more character long'})
-    .max(16, {message: 'Must be 16 or 4 characters long'}),
+    .string()
+    .refine(val => !isNaN(Number(val)), {
+      message: 'Must be a valid number',
+    })
+    .transform(val => Number(val))
+    .pipe(
+      z
+        .number()
+        .int()
+        .min(4, {message: 'Must be 4 or more characters long'})
+        .max(16, {message: 'Must be 16 or fewer characters long'}),
+    ),
 });
 
 interface PasswordFormValues {
@@ -29,7 +38,7 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [isPasswordGenerated, setIsPasswordGenerated] = useState(false);
 
-  const [isLowerCase, setIsLowerCase] = useState(false);
+  const [isLowerCase, setIsLowerCase] = useState(true);
   const [isUpperCase, setIsUpperCase] = useState(false);
   const [isNumbers, setIsNumbers] = useState(false);
   const [isSymbols, setIsSymbols] = useState(false);
@@ -72,14 +81,13 @@ export default function App() {
   const resetPasswordState = () => {
     setPassword('');
     setIsPasswordGenerated(false);
-    setIsLowerCase(false);
+    setIsLowerCase(true);
     setIsUpperCase(false);
     setIsNumbers(false);
     setIsSymbols(false);
   };
 
   const {
-    register,
     handleSubmit,
     reset,
     control,
@@ -114,18 +122,19 @@ export default function App() {
                   placeholder="Ex. 8"
                   keyboardType="numeric"
                   onBlur={onBlur}
-                  onChangeText={text => onChange(Number(text))}
-                  value={value ? value.toString() : ''}
+                  onChangeText={onChange}
+                  value={value?.toString() || ''}
                 />
               )}
               name="passwordLength"
             />
-            {touchedFields.passwordLength && errors.passwordLength && (
-              <Text style={styles.errorText}>
-                {errors.passwordLength.message?.toString()}
-              </Text>
-            )}
           </View>
+
+          {errors.passwordLength && (
+            <Text style={styles.errorText}>
+              {errors.passwordLength.message?.toString()}
+            </Text>
+          )}
 
           {/* lowercase */}
           <View style={styles.inputWrapper}>
@@ -252,8 +261,9 @@ const styles = StyleSheet.create({
     borderColor: '#16213e',
   },
   errorText: {
-    fontSize: 12,
+    fontSize: 16,
     color: '#ff0d10',
+    marginBottom: 4,
   },
   formActions: {
     flexDirection: 'row',
