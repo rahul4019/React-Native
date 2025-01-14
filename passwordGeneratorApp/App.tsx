@@ -8,29 +8,14 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {isValid, string, z} from 'zod';
+import {isValid, z} from 'zod';
 import {useForm, SubmitHandler, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
-const passwordSchema = z.object({
-  passwordLength: z
-    .string()
-    .refine(val => !isNaN(Number(val)), {
-      message: 'Must be a valid number',
-    })
-    .transform(val => Number(val))
-    .pipe(
-      z
-        .number()
-        .int()
-        .min(4, {message: 'Must be 4 or more characters long'})
-        .max(16, {message: 'Must be 16 or fewer characters long'}),
-    ),
-});
-
 interface PasswordFormValues {
   passwordLength: number;
+  characterTypes?: string;
 }
 
 // form validation
@@ -42,6 +27,27 @@ export default function App() {
   const [isUpperCase, setIsUpperCase] = useState(false);
   const [isNumbers, setIsNumbers] = useState(false);
   const [isSymbols, setIsSymbols] = useState(false);
+
+  const passwordSchema = z
+    .object({
+      passwordLength: z
+        .string()
+        .refine(val => !isNaN(Number(val)), {
+          message: 'Must be a valid number',
+        })
+        .transform(val => Number(val))
+        .pipe(
+          z
+            .number()
+            .int()
+            .min(4, {message: 'Must be 4 or more characters long'})
+            .max(16, {message: 'Must be 16 or fewer characters long'}),
+        ),
+    })
+    .refine(() => isLowerCase || isUpperCase || isNumbers || isSymbols, {
+      message: 'Select at least on character type',
+      path: ['characterTypes'],
+    });
 
   const generatePasswordString = (passwordLength: number) => {
     let characterList = '';
@@ -91,10 +97,16 @@ export default function App() {
     handleSubmit,
     reset,
     control,
-    formState: {errors, touchedFields},
+    formState: {errors},
   } = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
     mode: 'onChange',
+    context: {
+      isLowerCase,
+      isUpperCase,
+      isNumbers,
+      isSymbols,
+    },
   });
 
   const onSubmit: SubmitHandler<PasswordFormValues> = values => {
@@ -205,6 +217,12 @@ export default function App() {
             </TouchableOpacity>
           </View>
         </View>
+        {/* Add this after all checkbox groups */}
+        {errors.characterTypes && (
+          <Text style={[styles.errorText, {alignSelf: 'center'}]}>
+            {errors.characterTypes.message}
+          </Text>
+        )}
         {isPasswordGenerated ? (
           <View style={[styles.card, styles.cardElevated]}>
             <Text style={styles.subTitle}>Result:</Text>
