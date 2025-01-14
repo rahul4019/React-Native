@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {z} from 'zod';
+import {isValid, z} from 'zod';
 import {useForm, SubmitHandler, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -19,6 +19,10 @@ const passwordSchema = z.object({
     .min(4, {message: 'Must be 4 or more character long'})
     .max(16, {message: 'Must be 16 or 4 characters long'}),
 });
+
+interface PasswordFormValues {
+  passwordLength: number;
+}
 
 // form validation
 export default function App() {
@@ -80,13 +84,17 @@ export default function App() {
     reset,
     control,
     formState: {errors, touchedFields},
-  } = useForm({resolver: zodResolver(passwordSchema)});
+  } = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    mode: 'onChange',
+  });
 
-  const onSubmit = (values: z.infer<typeof passwordSchema>) => {
+  const onSubmit: SubmitHandler<PasswordFormValues> = values => {
     generatePasswordString(values.passwordLength);
     console.log(values);
     reset();
   };
+
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <SafeAreaView style={styles.appContainer}>
@@ -106,8 +114,8 @@ export default function App() {
                   placeholder="Ex. 8"
                   keyboardType="numeric"
                   onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value?.toString()}
+                  onChangeText={text => onChange(Number(text))}
+                  value={value ? value.toString() : ''}
                 />
               )}
               name="passwordLength"
@@ -172,14 +180,31 @@ export default function App() {
           </View>
 
           <View style={styles.formActions}>
-            <TouchableOpacity>
-              <Text>Generate Password</Text>
+            <TouchableOpacity
+              disabled={!isValid}
+              style={styles.primaryBtn}
+              onPress={handleSubmit(onSubmit)}>
+              <Text style={styles.secondaryBtnTxt}>Generate Password</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>Reset</Text>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={() => {
+                reset();
+                resetPasswordState();
+              }}>
+              <Text style={styles.secondaryBtnTxt}>Reset</Text>
             </TouchableOpacity>
           </View>
         </View>
+        {isPasswordGenerated ? (
+          <View style={[styles.card, styles.cardElevated]}>
+            <Text style={styles.subTitle}>Result:</Text>
+            <Text style={styles.description}>Long press to copy</Text>
+            <Text selectable style={styles.generatedPassword}>
+              {password}
+            </Text>
+          </View>
+        ) : null}
       </SafeAreaView>
     </ScrollView>
   );
@@ -252,6 +277,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 8,
     backgroundColor: '#CAD5E2',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   secondaryBtnTxt: {
     textAlign: 'center',
