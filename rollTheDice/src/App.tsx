@@ -1,6 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
-import {Image, ImageSourcePropType, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import DiceOne from '../assets/One.png';
 import DiceTwo from '../assets/Two.png';
@@ -22,7 +29,42 @@ const Dice = ({imageUrl}: DiceProps): React.JSX.Element => {
 };
 
 function App(): React.JSX.Element {
-  return <Text>Hello world!</Text>;
+  const [diceImage, setDiceImage] = useState<ImageSourcePropType>(DiceOne);
+  const handleDiceRoll = () => {
+    let randomNumber = Math.floor(Math.random() * 6) + 1;
+    switch (randomNumber) {
+      case 1:
+        setDiceImage(DiceOne);
+        break;
+      case 2:
+        setDiceImage(DiceTwo);
+        break;
+      case 3:
+        setDiceImage(DiceThree);
+        break;
+      case 4:
+        setDiceImage(DiceFour);
+        break;
+      case 5:
+        setDiceImage(DiceFive);
+        break;
+      case 6:
+        setDiceImage(DiceSix);
+        break;
+      default:
+        setDiceImage(DiceOne);
+        break;
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Dice imageUrl={diceImage} />
+      <Pressable style={styles.rollDiceBtnText} onPress={handleDiceRoll}>
+        <Text> Roll the Dice</Text>
+      </Pressable>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -40,6 +82,7 @@ const styles = StyleSheet.create({
     height: 200,
   },
   rollDiceBtnText: {
+    marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderWidth: 2,
