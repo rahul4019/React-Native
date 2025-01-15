@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 // constants
 import {currencyByRupee} from '../src/constants';
@@ -38,7 +47,43 @@ function App(): React.JSX.Element {
     }
   };
 
-  return <Text>Hello world</Text>;
+  return (
+    <>
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <View style={styles.rupeesContainer}>
+            <Text style={styles.rupee}>₹</Text>
+            <TextInput
+              maxLength={14}
+              value={inputValue}
+              clearButtonMode="always" // only for ios
+              onChangeText={setInputValue}
+              keyboardType="number-pad"
+              placeholder="Enter amount in Rupees"
+            />
+          </View>
+          {resultValue && <Text style={styles.resultTxt}>{resultValue}</Text>}
+        </View>
+        <View style={styles.bottomContainer}>
+          <FlatList
+            numColumns={2}
+            data={currencyByRupee}
+            keyExtractor={item => item.name}
+            renderItem={({item}) => (
+              <Pressable
+                style={[
+                  styles.button,
+                  targetCurrency === item.name && styles.selected,
+                ]}
+                onPress={() => handleButtonPress(item)}>
+                <CurrencyButton {...item} />
+              </Pressable>
+            )}
+          />
+        </View>
+      </View>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -58,7 +103,6 @@ const styles = StyleSheet.create({
   },
   rupee: {
     marginRight: 8,
-
     fontSize: 22,
     color: '#000000',
     fontWeight: '800',
@@ -80,10 +124,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-
     margin: 12,
-    height: 60,
-
     borderRadius: 12,
     backgroundColor: '#fff',
     elevation: 2,
