@@ -30,7 +30,7 @@ function App(): React.JSX.Element {
         board[i][0] === board[i][2] &&
         board[i][0] !== null
       ) {
-        return `player ${board[i][0]} is winner!`;
+        setGameWinner(`Player ${board[i][0]} has won the game! 🥳`);
       }
     }
     // column wise wnner check
@@ -40,7 +40,7 @@ function App(): React.JSX.Element {
         board[0][i] === board[2][i] &&
         board[0][i] !== null
       ) {
-        return `player ${board[0][i]} is winner!`;
+        setGameWinner(`Player ${board[0][i]} has won the game! 🥳`);
       }
     }
     // diagonal check
@@ -49,7 +49,7 @@ function App(): React.JSX.Element {
       board[0][0] === board[2][2] &&
       board[0][0] !== null
     ) {
-      return `player ${board[0][0]} is winner!`;
+      setGameWinner(`Player ${board[0][0]} has won the game! 🥳`);
     }
 
     // anti diagonal check
@@ -58,9 +58,13 @@ function App(): React.JSX.Element {
       board[0][2] === board[2][0] &&
       board[0][2] !== null
     ) {
-      return `player ${board[0][2]} is winner!`;
+      setGameWinner(`Player ${board[0][2]} has won the game! 🥳`);
     }
-    return null;
+
+    const isDraw = board.map(arr => arr.includes(null));
+    if (isDraw) {
+      setGameWinner('Its a Draw...⌛');
+    }
   };
 
   return (
