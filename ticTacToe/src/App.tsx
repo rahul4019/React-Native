@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import Snackbar from 'react-native-snackbar';
 import Icons from './components/Icons';
+import {FlatList} from 'react-native';
+import {Pressable} from 'react-native';
 
 function App(): React.JSX.Element {
   const [isCross, setIsCross] = useState<boolean>(false);
@@ -90,12 +92,57 @@ function App(): React.JSX.Element {
     isWinner();
   };
 
+  const boardData = [
+    {row: 0, col: 0},
+    {row: 0, col: 1},
+    {row: 0, col: 2},
+    {row: 1, col: 0},
+    {row: 1, col: 1},
+    {row: 1, col: 2},
+    {row: 2, col: 0},
+    {row: 2, col: 1},
+    {row: 2, col: 2},
+  ];
+
   return (
     <SafeAreaView>
       <StatusBar />
-      <View>
-        <Text>Hello world</Text>
-      </View>
+      {gameWinner ? (
+        <View style={[styles.playerInfo, styles.winnerInfo]}>
+          <Text style={styles.winnerTxt}>{gameWinner}</Text>
+        </View>
+      ) : (
+        <View
+          style={[
+            styles.playerInfo,
+            isCross ? styles.playerX : styles.playerO,
+          ]}>
+          <Text style={styles.gameTurnTxt}>
+            Player{isCross ? ' X' : ' O'}'s Turn
+          </Text>
+        </View>
+      )}
+      {/*Game Board*/}
+      <FlatList
+        data={boardData}
+        numColumns={3}
+        style={styles.grid}
+        renderItem={({item, index}) => (
+          <Pressable
+            key={index}
+            style={styles.card}
+            onPress={() => onChangeItem(item.row, item.col)}>
+            <Icons name={board[item.row][item.col]} />
+          </Pressable>
+        )}
+      />
+
+      {/* game reset */}
+      <Pressable style={styles.gameBtn} onPress={reloadGame}>
+        <Text style={styles.gameBtnText}>
+          {gameWinner ? 'Start new game' : 'Reload the game'}
+        </Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
