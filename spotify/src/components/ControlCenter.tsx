@@ -1,7 +1,6 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native/types';
+import {StyleSheet, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {playbackService} from '../../musicPlayerServices';
 import TrackPlayer, {State, usePlaybackState} from 'react-native-track-player';
 import {Pressable} from 'react-native';
 
@@ -20,7 +19,7 @@ export default function ControlCenter() {
 
   // play/pause toggle
   const togglePlayback = async (playback: State) => {
-    const currentTrack = await TrackPlayer.getCurrentTrack();
+    const currentTrack = await TrackPlayer.getActiveTrackIndex();
 
     if (currentTrack !== null) {
       if (playback === State.Paused || playback === State.Ready) {
