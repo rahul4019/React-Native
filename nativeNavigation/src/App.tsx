@@ -16,8 +16,24 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-function App(): React.JSX.Element {
-  return <SafeAreaView></SafeAreaView>;
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{title: 'Trending Products'}}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{title: 'Product Profile'}}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 export default App;
