@@ -26,6 +26,11 @@ export default function Home() {
             productId: '123',
           })
         }
+        // onPress={() =>
+        //   navigation.push('Profile', {
+        //     productId: '123',
+        //   })
+        // }
       />
     </View>
   );
